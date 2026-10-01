@@ -24,8 +24,6 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - uses: android-actions/setup-android@v3
-
       - name: Install and bundle web app
         run: |
           npm ci
@@ -36,6 +34,7 @@ jobs:
         working-directory: android
         run: |
           chmod +x gradlew
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
           ./gradlew assembleRelease --no-daemon
 
       - name: Rename APK
