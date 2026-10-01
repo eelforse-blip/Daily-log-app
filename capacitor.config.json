@@ -1,0 +1,11 @@
+{
+  "appId": "com.elforse.dailylog",
+  "appName": "دفتر اليوم",
+  "webDir": "www",
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_notify",
+      "iconColor": "#1F7A5C"
+    }
+  }
+}

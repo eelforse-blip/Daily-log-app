@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f7a5c">
+<title>دفتر اليوم</title>
+<style>
+@font-face{font-family:Body;font-weight:400;src:url(fonts/ibm-plex-sans-arabic-arabic-400-normal.woff2);unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200F}
+@font-face{font-family:Body;font-weight:400;src:url(fonts/ibm-plex-sans-arabic-latin-400-normal.woff2);unicode-range:U+0000-024F,U+2000-206F,U+2212}
+@font-face{font-family:Body;font-weight:600;src:url(fonts/ibm-plex-sans-arabic-arabic-600-normal.woff2);unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200F}
+@font-face{font-family:Body;font-weight:600;src:url(fonts/ibm-plex-sans-arabic-latin-600-normal.woff2);unicode-range:U+0000-024F,U+2000-206F,U+2212}
+@font-face{font-family:Head;font-weight:700;src:url(fonts/cairo-arabic-700-normal.woff2);unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF}
+@font-face{font-family:Head;font-weight:700;src:url(fonts/cairo-latin-700-normal.woff2);unicode-range:U+0000-024F,U+2000-206F}
+:root{
+  --bg:#f3f5f2; --surface:#ffffff; --ink:#18221f; --muted:#5f6d68; --line:#dde3df;
+  --do:#1f7a5c; --do-soft:#e2f2ea; --avoid:#c2452f; --avoid-soft:#fbe7e2; --warn:#a86a07; --warn-soft:#fbf1dc;
+  --accent:#1f7a5c; --chip:#eef1ee; --on-accent:#ffffff;
+  --f-display:Head,Body,system-ui,sans-serif; --f-body:Body,system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#111816; --surface:#19221f; --ink:#e7eeeb; --muted:#9aaaa4; --line:#2a3632;
+  --do:#4cc396; --do-soft:#173229; --avoid:#f07a62; --avoid-soft:#3a1f19; --warn:#e2a93b; --warn-soft:#352a14;
+  --accent:#4cc396; --chip:#22302b; --on-accent:#0d1a15; color-scheme:dark}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-body);font-size:15px;line-height:1.6;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.wrap{max-width:560px;margin:0 auto;padding-inline:16px;padding-block:14px 90px;display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:var(--f-display);margin:0}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-family:var(--f-display);font-weight:700;font-size:21px}
+.status{font-size:12px;color:var(--muted)}
+.tabs{display:flex;gap:4px;background:var(--chip);padding:4px;border-radius:12px;position:sticky;top:0;z-index:5}
+.tabs button{flex:1;border:0;background:transparent;padding:8px 6px;border-radius:9px;font-weight:600;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgb(0 0 0/.08)}
+.daybar{display:flex;align-items:center;gap:10px}
+.daybar .nav{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:20px;line-height:1}
+.daybar .nav:disabled{opacity:.35}
+.daybar .d{flex:1;text-align:center}
+.daybar .d b{display:block;font-family:var(--f-display);font-size:19px}
+.daybar .d span{font-size:12.5px;color:var(--muted)}
+.today-link{border:0;background:none;color:var(--accent);font-size:12.5px;font-weight:600;padding:0}
+.score{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.score > div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.score small{display:block;color:var(--muted);font-size:12px}
+.score strong{font-family:var(--f-display);font-size:22px;font-variant-numeric:tabular-nums}
+.bar{height:6px;border-radius:3px;background:var(--chip);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;border-radius:3px;transition:width .25s}
+.section{display:flex;flex-direction:column;gap:8px}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between}
+.sec-head h2{font-size:16px}
+.tag{font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px}
+.do .tag{background:var(--do-soft);color:var(--do)}
+.avoid .tag{background:var(--avoid-soft);color:var(--avoid)}
+.item{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.item .t{flex:1;min-width:0}
+.item .t b{display:block;font-weight:600}
+.item .t small{color:var(--muted);font-size:12.5px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pill{font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:99px;background:var(--chip);color:var(--muted)}
+.pill.late{background:var(--warn-soft);color:var(--warn)}
+.pill.ok{background:var(--do-soft);color:var(--do)}
+.pill.bad{background:var(--avoid-soft);color:var(--avoid)}
+.check{width:38px;height:38px;flex:none;border-radius:11px;border:2px solid var(--line);background:transparent;display:grid;place-items:center}
+.check svg{width:20px;height:20px;opacity:0}
+.item.done{border-color:color-mix(in srgb,var(--do) 40%,var(--line))}
+.item.done .check{background:var(--do);border-color:var(--do)}
+.item.done .check svg{opacity:1}
+.item.done .t b{color:var(--muted);text-decoration:line-through}
+.counter{display:flex;align-items:center;gap:6px;flex:none}
+.counter button{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:19px;line-height:1}
+.counter output{min-width:26px;text-align:center;font-family:var(--f-display);font-size:18px;font-variant-numeric:tabular-nums}
+.item.slip{border-color:color-mix(in srgb,var(--avoid) 45%,var(--line));background:color-mix(in srgb,var(--avoid-soft) 55%,var(--surface))}
+.note textarea{width:100%;min-height:140px;resize:vertical;border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:12px;line-height:1.7}
+.hint{font-size:12px;color:var(--muted)}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:16px;text-align:center;color:var(--muted)}
+.btn{border:0;border-radius:11px;padding:9px 14px;font-weight:600;background:var(--accent);color:var(--on-accent)}
+.btn.ghost{background:var(--chip);color:var(--ink)}
+.btn.danger{background:var(--avoid-soft);color:var(--avoid)}
+.grid-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+table.hg{border-collapse:collapse;font-size:12.5px}
+table.hg th{font-weight:500;color:var(--muted);padding:2px;text-align:center;font-variant-numeric:tabular-nums}
+table.hg td{padding:3px 2px;text-align:center}
+table.hg td.n{text-align:start;white-space:nowrap;padding-inline-end:10px;font-weight:600;max-width:130px;overflow:hidden;text-overflow:ellipsis}
+.dot{display:inline-block;width:14px;height:14px;border-radius:4px;background:var(--chip)}
+.dot.g{background:var(--do)} .dot.r{background:var(--avoid)}
+.legend{display:flex;gap:12px;font-size:12px;color:var(--muted);margin-top:6px;flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:5px}
+.day-row{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:start;width:100%}
+.day-row .dt{flex:none;width:66px}
+.day-row .dt b{display:block;font-family:var(--f-display)}
+.day-row .dt small{color:var(--muted);font-size:12px}
+.day-row .tx{flex:1;min-width:0;font-size:13.5px;color:var(--muted);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.day-row .sc{flex:none;font-size:12px;display:flex;flex-direction:column;gap:3px;align-items:flex-end}
+.card{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px}
+.card h3{font-size:15px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row > *{min-width:0}
+.card input[type=text]{flex:1 1 170px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--bg)}
+.card input[type=time],.card input[type=number],.card select{border:1px solid var(--line);border-radius:10px;padding:7px 8px;background:var(--bg)}
+.card input[type=number]{width:70px}
+.card label{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.le{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.le:first-child{border-top:0;padding-top:0}
+.le .head{display:flex;gap:8px;align-items:center}
+.le .kind{width:8px;height:30px;border-radius:4px;flex:none}
+.le .kind.do{background:var(--do)} .le .kind.avoid{background:var(--avoid)}
+.days{display:flex;gap:4px;flex-wrap:wrap}
+.days button{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:2px 7px;font-size:12px;color:var(--muted)}
+.days button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.perm{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.perm span{font-size:13.5px}
+.backup textarea{width:100%;min-height:80px;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:8px;font-size:12px;direction:ltr}
+.toast{position:fixed;inset-inline:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));margin:auto;width:max-content;max-width:calc(100% - 32px);background:var(--ink);color:var(--bg);padding:9px 15px;border-radius:10px;font-size:13.5px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">دفتر اليوم</div>
+    <div class="status" id="status"></div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tab-day" aria-selected="true" data-tab="day">اليوم</button>
+    <button role="tab" id="tab-hist" aria-selected="false" data-tab="hist">السجل</button>
+    <button role="tab" id="tab-set" aria-selected="false" data-tab="set">البنود والتنبيهات</button>
+  </div>
+
+  <section id="view-day" class="section" style="gap:14px">
+    <div class="daybar">
+      <button class="nav" id="prev" aria-label="اليوم السابق">›</button>
+      <div class="d"><b id="d-title">—</b><span id="d-sub"></span> <button class="today-link" id="go-today" hidden>ارجع لليوم</button></div>
+      <button class="nav" id="next" aria-label="اليوم التالي">‹</button>
+    </div>
+    <div class="score">
+      <div><small>مهام اتعملت</small><strong id="s-do">0/0</strong><div class="bar"><i id="b-do" style="background:var(--do);width:0"></i></div></div>
+      <div><small>التزام بالابتعاد</small><strong id="s-av">0/0</strong><div class="bar"><i id="b-av" style="background:var(--avoid);width:0"></i></div></div>
+    </div>
+    <div class="section do">
+      <div class="sec-head"><h2>المطلوب عمله</h2><span class="tag">افعل</span></div>
+      <div id="list-do"></div>
+    </div>
+    <div class="section avoid">
+      <div class="sec-head"><h2>ابتعد عن</h2><span class="tag">تجنّب</span></div>
+      <div id="list-av"></div>
+    </div>
+    <div class="section note">
+      <div class="sec-head"><h2>ملاحظات اليوم</h2><span class="hint" id="note-state"></span></div>
+      <textarea id="note" placeholder="إيه اللي حصل النهارده؟ فكرة، ملاحظة، أو سبب إنك شربت القهوة…"></textarea>
+    </div>
+  </section>
+
+  <section id="view-hist" class="section" hidden>
+    <div class="sec-head"><h2>آخر 14 يوم</h2></div>
+    <div class="grid-wrap"><table class="hg" id="hgrid"></table>
+      <div class="legend"><span><i class="dot g"></i>اتعمل / التزمت</span><span><i class="dot r"></i>فاتك / تجاوزت</span><span><i class="dot"></i>مفيش تسجيل</span></div>
+    </div>
+    <div class="sec-head" style="margin-top:6px"><h2>الأيام والملاحظات</h2></div>
+    <div id="days" class="section"></div>
+  </section>
+
+  <section id="view-set" class="section" hidden>
+    <div class="card">
+      <h3>التنبيهات</h3>
+      <div class="perm"><span id="perm-notif">…</span><button class="btn ghost" id="btn-perm" hidden>تفعيل</button></div>
+      <div class="perm"><span id="perm-exact">…</span><button class="btn ghost" id="btn-exact" hidden>فتح الإعداد</button></div>
+      <div class="row"><button class="btn ghost" id="btn-test">جرّب تنبيه بعد 10 ثواني</button><span class="hint" id="sched-count"></span></div>
+    </div>
+
+    <div class="card">
+      <h3>إضافة بند جديد</h3>
+      <div class="row">
+        <select id="n-type" aria-label="النوع"><option value="do">افعل</option><option value="avoid">ابتعد عن</option></select>
+        <input type="text" id="n-title" placeholder="مثلًا: مشي 30 دقيقة" aria-label="اسم البند">
+      </div>
+      <div class="row">
+        <label>ميعاد التنبيه <input type="time" id="n-time"></label>
+        <label id="n-limit-wrap" hidden>الحد في اليوم <input type="number" id="n-limit" min="0" value="0"></label>
+        <button class="btn" id="n-add">إضافة</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>بنودك</h3>
+      <div id="edit-list"></div>
+    </div>
+
+    <div class="card backup">
+      <h3>نسخة احتياطية</h3>
+      <p class="hint" style="margin:0">بياناتك محفوظة على الموبايل ده بس. انسخ النسخة الاحتياطية وابعتها لنفسك كل فترة، أو الصق نسخة قديمة عشان ترجّعها.</p>
+      <div class="row"><button class="btn ghost" id="bk-copy">نسخ النسخة الاحتياطية</button><button class="btn ghost" id="bk-show">استرجاع</button></div>
+      <div id="bk-restore" hidden>
+        <textarea id="bk-text" placeholder="الصق النسخة الاحتياطية هنا"></textarea>
+        <div class="row" style="margin-top:6px"><button class="btn danger" id="bk-apply">استبدل بياناتي بالنسخة دي</button></div>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script src="app.js"></script>
+</body>
+</html>
